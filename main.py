@@ -2,6 +2,8 @@ import numpy as np
 import pandas as pd
 import seaborn as sns 
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
 
 
 df = pd.read_csv("Mall_Customers.csv")
@@ -15,9 +17,9 @@ df = pd.read_csv("Mall_Customers.csv")
 
 #Distribution
 num_cols = ['CustomerID','Age','AnnualIncome','SpendingScore']
-for col in num_cols:
-    sns.histplot(df[col], kde=True)
-    plt.title("Distribution")
+# for col in num_cols:
+#     sns.histplot(df[col], kde=True)
+#     plt.title("Distribution")
     # plt.show()
 
 #Boxplots
@@ -27,5 +29,29 @@ for col in num_cols:
     # plt.show()
 
 #Pairplots
-sns.pairplot(df[num_cols])
+# sns.pairplot(df[num_cols])
+# plt.show()
+
+#PREPROCESSING
+df.drop(columns=['CustomerID'])
+df['Gender'] = df['Gender'].map({'Male':0,'Female':1})
+X = df[['Age', 'AnnualIncome', 'SpendingScore']]
+
+#scaling
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+#elbow method(k=?)
+wcss = []
+
+for k in range(1, 11):
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X_scaled)
+    wcss.append(kmeans.inertia_)
+
+plt.plot(range(1, 11), wcss, marker='o')
+plt.xlabel('Number of Clusters')
+plt.ylabel('WCSS')
+plt.title('Elbow Method')
 plt.show()
+
