@@ -4,6 +4,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
 
 
 df = pd.read_csv("Mall_Customers.csv")
@@ -23,9 +24,9 @@ num_cols = ['CustomerID','Age','AnnualIncome','SpendingScore']
     # plt.show()
 
 #Boxplots
-for col in num_cols:
-    sns.boxplot(x=df[col])
-    plt.title(f'Boxplot of {col}')
+# for col in num_cols:
+#     sns.boxplot(x=df[col])
+#     plt.title(f'Boxplot of {col}')
     # plt.show()
 
 #Pairplots
@@ -49,9 +50,29 @@ for k in range(1, 11):
     kmeans.fit(X_scaled)
     wcss.append(kmeans.inertia_)
 
-plt.plot(range(1, 11), wcss, marker='o')
-plt.xlabel('Number of Clusters')
-plt.ylabel('WCSS')
-plt.title('Elbow Method')
+# plt.plot(range(1, 11), wcss, marker='o')
+# plt.xlabel('Number of Clusters')
+# plt.ylabel('WCSS')
+# plt.title('Elbow Method')
+# plt.show()
+
+#KMEANS CLUSTERING
+kmeans = KMeans(n_clusters=5, random_state=42)
+clusters = kmeans.fit_predict(X_scaled)
+df["cluster"] = clusters
+
+score = silhouette_score(X_scaled, clusters)
+print("Silhouette Score:", score)
+
+sns.scatterplot(
+    x='AnnualIncome',
+    y='SpendingScore',
+    hue='cluster',
+    data=df,
+    palette='viridis'
+)
+plt.title("Customer Segments based on Income and Spending")
 plt.show()
+
+
 
