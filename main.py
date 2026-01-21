@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
+from sklearn.decomposition import PCA
 
 
 df = pd.read_csv("Mall_Customers.csv")
@@ -61,18 +62,43 @@ kmeans = KMeans(n_clusters=5, random_state=42)
 clusters = kmeans.fit_predict(X_scaled)
 df["cluster"] = clusters
 
-score = silhouette_score(X_scaled, clusters)
-print("Silhouette Score:", score)
+# score = silhouette_score(X_scaled, clusters)
+# print("Silhouette Score:", score)
 
+# sns.scatterplot(
+#     x='AnnualIncome',
+#     y='SpendingScore',
+#     hue='cluster',
+#     data=df,
+#     palette='viridis'
+# )
+# plt.title("Customer Segments based on Income and Spending")
+# plt.show()
+
+#PCA
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+pca_df = pd.DataFrame(
+    data=X_pca,
+    columns=['PC1', 'PC2']
+)
+
+pca_df['Cluster'] = df['cluster']
+
+plt.figure(figsize=(8, 6))
 sns.scatterplot(
-    x='AnnualIncome',
-    y='SpendingScore',
-    hue='cluster',
-    data=df,
+    x='PC1',
+    y='PC2',
+    hue='Cluster',
+    data=pca_df,
     palette='viridis'
 )
-plt.title("Customer Segments based on Income and Spending")
+plt.title('PCA-based Customer Segmentation')
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
 plt.show()
 
-
+print("Explained variance ratio:", pca.explained_variance_ratio_)
+print("Total variance explained:", pca.explained_variance_ratio_.sum())
 
